@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.18)
-project(drug_detection)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3" )
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --std=c++17 -Ofast" )
 
 # Boost
 find_package ( Boost 1.72 REQUIRED COMPONENTS filesystem system serialization iostreams  )

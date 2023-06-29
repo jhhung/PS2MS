@@ -557,7 +557,7 @@ ModificationType make_alkyl(int num, int h_num = 0)
 {
     char str[50];
     sprintf(str, "alkyl (num=%d, h_num=%d)", num, h_num);
-    
+
     Atom atom_c("C");
     std::vector<std::function<void(RWMOL_SPTR, std::vector<uint8_t>&)>> func = {
         [num = num, h_num = h_num, atom_c = atom_c] (RWMOL_SPTR mol, std::vector<uint8_t>& h_list) mutable
@@ -6208,19 +6208,29 @@ ModificationType make_thioketone(int h_num = 0)
     return std::make_tuple(std::string(str), 2 - h_num, func);
 }
 
-ModificationType make_thiol()
+ModificationType make_thiol(int h_num = 0)
 {
+    char str[50];
+    sprintf(str, "thiol (h_num=%d)", h_num);
+
+    std::vector<int> permutation(h_num, -1);
+    permutation.insert(permutation.end(), 2 - h_num, 1);
+    
     Atom atom_s("S");
-    Atom atom_h("H");
-    std::vector<std::function<void(RWMOL_SPTR, std::vector<uint8_t>&)>> func = {
-        [atom_s = atom_s, atom_h = atom_h] (RWMOL_SPTR mol, std::vector<uint8_t>& h_list) mutable
-        {
-            mol->replaceAtom(h_list[0], &atom_s);
-            // s = h_list[0];
-            add_bond(mol, h_list[0], mol->addAtom(&atom_h));
-        }
-    };
-    return std::make_tuple(std::string("thiol ()"), 1, func);
+    std::vector<std::function<void(RWMOL_SPTR, std::vector<uint8_t>&)>> func;
+    do
+    {
+        func.emplace_back(
+            [permutation = permutation, atom_s = atom_s] (RWMOL_SPTR mol, std::vector<uint8_t>& h_list) mutable
+            {
+                std::vector<uint8_t> link_point = calculate_link_point(mol, permutation, h_list);
+                mol->replaceAtom(link_point[0], &atom_s);
+                add_bond(mol, link_point[0], get_target(mol, link_point[1]));
+                mol->removeAtom(link_point[1]);
+            }
+        );
+    } while (std::next_permutation(permutation.begin(), permutation.end()));
+    return std::make_tuple(std::string(str), 2 - h_num, func);
 }
 
 ModificationType make_thiophosphate(int h_num = 0)
@@ -6797,784 +6807,386 @@ ModificationType make_ynone(int h_num = 0)
     return std::make_tuple(std::string(str), 2 - h_num, func);
 }
 
-std::vector<ModificationType> get_simple_modification_list()
+ModificationType make_benzyl(int h_num = 0)
 {
-    return {
-        make_alkyl(1),
-        make_alkyl(2),
-        make_alkyl(1, 1),
-        make_alkyl(2, 1),
-        make_alkyl(3, 1),
-        make_acetal(3),
-        make_acetoxy(),
-        make_acetyl(),
-        make_acyl_chloride(),
-        make_acyl_halide("F"),
-        make_acyl_halide("Cl"),
-        make_acyl_halide("Br"),
-        make_acyl_halide("I"),
-        make_alcohol(),
-        make_aldehyde(),
-        make_alkyl_nitrites(),
-        make_amide(2),
-        make_aminal(3),
-        make_amine(2),
-        make_amine_oxide(2),
-        make_azo(1),
-        make_carbonyl(1),
-        make_carboximidate(2),
-        make_carboxylic_acid(),
-        make_chloroformate(),
-        make_cyanate(),
-        make_cyanate(false),
-        make_disulfide(1),
-        make_dithiocarbamate(2),
-        make_ester(1),
-        make_haloalkane("F"),
-        make_haloalkane("Cl"),
-        make_haloalkane("Br"),
-        make_haloalkane("I"),
-        make_hemithioacetal(1),
-        make_hydroperoxide(),
-        make_imidic_acid(1),
-        make_imidoyl_chloride(1),
-        make_ketone(1),
-        make_methanedithiol(3),
-        make_nitro(),
-        make_nitroamine(1),
-        make_nitroso(),
-        make_s_nitrosothiol(),
-        make_organic_peroxide(1),
-        make_phosphaalkene(2),
-        make_phosphaalkyne(),
-        make_phosphine(2),
-        make_phosphine_oxide(2),
-        make_phosphinite(2),
-        make_phosphonium(3),
-        make_schiff_base(2),
-        make_selenenic_acid(),
-        make_selenol(),
-        make_selone(1),
-        make_silyl_ether(3),
-        make_sulfenamide(2),
-        make_sulfenyl_chloride(),
-        make_sulfide(1),
-        make_sulfilimine(2),
-        make_sulfinic_acid(),
-        make_sulfone(1),
-        make_sulfonic_acid(),
-        make_sulfonyl_halide("F"),
-        make_sulfonyl_halide("Cl"),
-        make_sulfonyl_halide("Br"),
-        make_sulfonyl_halide("I"),
-        make_telluroketone(1),
-        make_tellurol(),
-        make_thial(),
-        make_thioacyl_chloride(),
-        make_thiocarboxylic_acid(),
-        make_thiocarboxylic_acid(false),
-        make_thiocyanate(),
-        make_thioester(1),
-        make_thioketene(1),
-        make_thioketone(1),
-        make_thiol(),
-        make_vinyl(),
-    };
+    char str[50];
+    sprintf(str, "benzyl (h_num=%d)", h_num);
+
+    std::vector<int> permutation(h_num, -1);
+    permutation.insert(permutation.end(), 2 - h_num, 1);
+    
+    Atom atom_c("C");
+    std::vector<std::function<void(RWMOL_SPTR, std::vector<uint8_t>&)>> func;
+    do
+    {
+        func.emplace_back(
+            [permutation = permutation, atom_c = atom_c] (RWMOL_SPTR mol, std::vector<uint8_t>& h_list) mutable
+            {
+                std::vector<uint8_t> link_point = calculate_link_point(mol, permutation, h_list);
+                mol->replaceAtom(link_point[0], &atom_c);
+                // left_c = link_point[0];
+                mol->replaceAtom(link_point[1], &atom_c);
+                // right_c = link_point[1];
+                add_bond(mol, link_point[0], link_point[1], 1);
+                int next_c, last_c = link_point[1];
+                for (int i = 0; i < 5; ++i)
+                {
+                    next_c = mol->addAtom(&atom_c);
+                    mol->addBond(last_c, next_c, Bond::BondType::AROMATIC);
+                    last_c = next_c;
+                }
+                mol->addBond(last_c, link_point[1], Bond::BondType::AROMATIC);
+            }
+        );
+    } while (std::next_permutation(permutation.begin(), permutation.end()));
+    return std::make_tuple(std::string(str), 2 - h_num, func);
 }
 
-std::vector<ModificationType> get_modification_test_list()
+ModificationType make_benzene(int h_num = 0)
 {
-    return {
-        make_alkyl(0)
-        // make_methylene_bridge(),
-    };
+    char str[50];
+    sprintf(str, "benzene (h_num=%d)", h_num);
+
+    std::vector<int> permutation(h_num, -1);
+    permutation.insert(permutation.end(), 2 - h_num, 1);
+    
+    Atom atom_c("C");
+    std::vector<std::function<void(RWMOL_SPTR, std::vector<uint8_t>&)>> func;
+    do
+    {
+        func.emplace_back(
+            [permutation = permutation, atom_c = atom_c] (RWMOL_SPTR mol, std::vector<uint8_t>& h_list) mutable
+            {
+                std::vector<uint8_t> link_point = calculate_link_point(mol, permutation, h_list);
+                mol->replaceAtom(link_point[0], &atom_c);
+                // left_c = link_point[0];
+                int next_c, last_c = link_point[0];
+                for (int i = 0; i < 5; ++i)
+                {
+                    next_c = mol->addAtom(&atom_c);
+                    mol->addBond(last_c, next_c, Bond::BondType::AROMATIC);
+                    last_c = next_c;
+                }
+                mol->addBond(last_c, link_point[0], Bond::BondType::AROMATIC);
+            }
+        );
+    } while (std::next_permutation(permutation.begin(), permutation.end()));
+    return std::make_tuple(std::string(str), 2 - h_num, func);
 }
 
-std::vector<ModificationType> get_modification_list()
+ModificationType make_sulfide_ether(int h_num = 0)
 {
-    return {
-        make_alkyl(0),
-        make_alkyl(1),
-        make_alkyl(2),
-        make_alkyl(3),
-        make_alkyl(4),
-        make_alkyl(1, 1),
-        make_alkyl(2, 1),
-        make_alkyl(3, 1),
-        make_acetal(),//
-        make_acetal(1),//
-        make_acetal(2),
-        make_acetal(3),
-        make_acetoxy(),
-        make_acetyl(),
-        make_acetylide("Li"),//
-        make_acetylide("Na"),//
-        make_acetylide("K"),//
-        make_acetylide("Mg"),//
-        make_acetylide("Ca"),//
-        make_acetylide("Fe"),//
-        make_acetylide("Al"),//
-        make_acid_anhydride(),
-        make_acid_anhydride(1),
-        make_acryloyl(),
-        make_acyl_azide(),
-        make_acyl_chloride(),
-        make_acyl_halide("F"),
-        make_acyl_halide("Cl"),
-        make_acyl_halide("Br"),
-        make_acyl_halide("I"),
-        make_acylal(),//
-        make_acylal(1),//
-        make_acylal(2),
-        make_acylhydrazine(),//
-        make_acylhydrazine(1),//
-        make_acylhydrazine(2),//
-        make_acylhydrazine(3),
-        make_acyloin(),//
-        make_acyloin(1),
-        make_acylsilane(),//
-        make_acylsilane(1),//
-        make_acylsilane(2),//
-        make_acylsilane(3),
-        make_acylurea(),
-        make_alcohol(),
-        make_aldehyde(),
-        make_aldimine(),
-        make_aldimine(1),
-        make_alkene(),//
-        make_alkene(1),
-        make_alkoxide(),//
-        make_alkyl_nitrites(),
-        make_alkyne(),//
-        make_alkyne(1),
-        make_allyl(),
-        make_amide(),//
-        make_amide(1),//
-        make_amide(2),
-        make_amidine(),
-        make_amidrazone(),
-        make_amidrazone(true),
-        make_aminal(),//
-        make_aminal(1),//
-        make_aminal(2),
-        make_aminal(3),
-        make_amine(),//
-        make_amine(1),//
-        make_amine(2),
-        make_amine_oxide(),//
-        make_amine_oxide(1),
-        make_amine_oxide(2),
-        make_aminophosphine_r3(),//
-        make_aminophosphine_r3(1),//
-        make_aminophosphine_r3(2),
-        make_aminophosphine_r2(0, 0),//
-        make_aminophosphine_r2(0, 1),//
-        make_aminophosphine_r2(0, 2),
-        make_aminophosphine_r2(1, 0),//
-        make_aminophosphine_r2(1, 1),
-        make_aminophosphine_r2(1, 2),
-        make_aminophosphine_r2(2, 0),
-        make_aminophosphine_r2(2, 1),
-        make_aminophosphine_r1(0, 0),//
-        make_aminophosphine_r1(0, 1),//
-        make_aminophosphine_r1(0, 2),//
-        make_aminophosphine_r1(0, 3),//
-        make_aminophosphine_r1(0, 4),
-        make_aminophosphine_r1(1, 0),//
-        make_aminophosphine_r1(1, 1),//
-        make_aminophosphine_r1(1, 2),//
-        make_aminophosphine_r1(1, 3),
-        make_aminophosphine_r0(0),//
-        make_aminophosphine_r0(1),//
-        make_aminophosphine_r0(2),//
-        make_aminophosphine_r0(3),//
-        make_aminophosphine_r0(4),
-        make_aminophosphine_r0(5),
-        make_aminoxyl(),
-        make_aminoxyl(1),
-        make_azide(),
-        make_azide(false),
-        make_azine(),//
-        make_azine(1),//
-        make_azine(2),
-        make_azine(3),
-        make_aziridine(),//
-        make_aziridine(1),//
-        make_aziridine(2),//
-        make_aziridine(3),//
-        make_aziridine(4),
-        make_azo(),
-        make_azo(1),
-        make_azole_3_hands_1_atom("N"),//
-        make_azole_3_hands_1_atom("N", 1),//
-        make_azole_3_hands_1_atom("N", 2),
-        make_azole_3_hands_1_atom("N", 3),
-        make_azole_3_hands_2_atoms("N"),//
-        make_azole_3_hands_2_atoms("N", 1),
-        make_azole_3_hands_2_atoms("N", 2),
-        make_azole_3_hands_3_atoms("N"),
-        make_azole_3_hands_3_atoms("N", 1),
-        make_azole_3_hands_4_atoms("N"),
-        make_azole_2_hands_1_atom("O"),//
-        make_azole_2_hands_1_atom("O", 1),
-        make_azole_2_hands_1_atom("O", 2),
-        make_azole_2_hands_2_atoms("O"),
-        make_azole_2_hands_2_atoms("O", 1),
-        make_azole_2_hands_3_atoms("O"),
-        make_azoxy(),
-        make_azoxy(1),
-        make_basic_aluminium_r2(),//
-        make_basic_aluminium_r2(1),//
-        make_basic_aluminium_r1(),
-        make_benzylidene_acetal(),
-        make_benzylidene_acetal(1),
-        make_bisthiosemicarbazone(),//
-        make_bisthiosemicarbazone(1),//
-        make_bisthiosemicarbazone(2),
-        make_bisthiosemicarbazone(3),
-        make_biuret(),//
-        make_biuret(1),
-        make_biuret(2),
-        make_boronic_acid(),
-        make_carbamate(),//
-        make_carbamate(1),
-        make_carbamate(2),
-        make_carbamoyl_chloride(),
-        make_carbamoyl_chloride(1),
-        make_carbazide(),
-        make_carbazide(1),
-        make_carbene(),
-        make_carbene(1),
-        make_carbodiimide(),
-        make_carbodiimide(1),
-        make_carbonate_ester(),
-        make_carbonate_ester(1),
-        make_carbonyl(),
-        make_carbonyl(1),
-        make_carboximidate(),//
-        make_carboximidate(1),
-        make_carboximidate(2),
-        make_carboxylic_acid(),
-        make_chloroformate(),
-        make_cyanate(),
-        make_cyanate(false),
-        make_cyanate_ester(),
-        make_cyanimide(),
-        make_cyanimide(1),
-        make_cyanohydrin(),
-        make_cyanohydrin(1),
-        make_cyanomethyl(),
-        make_cyclopropyl(),
-        make_diazo(),
-        make_diazo(1),
-        make_diazo(0, false),
-        make_diazo(1, false),
-        make_diazonium("F"),//
-        make_diazonium("Cl"),//
-        make_diazonium("Br"),//
-        make_diazonium("I"),//
-        make_dicarbonate(),
-        make_dicarbonate(1),
-        make_diketopiperazine(),
-        make_diketopiperazine(1),
-        make_diketopiperazine(0, 1),
-        make_diketopiperazine(1, 1),
-        make_diketopiperazine(0, 2),
-        make_diketopiperazine(1, 2),
-        make_dioxazolone(),
-        make_dioxirane(),
-        make_dioxirane(1),
-        make_diphenyltriazene(),
-        make_diphenyltriazene(1),
-        make_disulfide(),
-        make_disulfide(1),
-        make_dithiocarbamate(),//
-        make_dithiocarbamate(1),
-        make_dithiocarbamate(2),
-        make_dithiol(),
-        make_enamine(),//
-        make_enamine(1),//
-        make_enamine(2),//
-        make_enamine(3),
-        make_enamine(4),
-        make_vicinal_diol(),
-        make_geminal_diol(),
-        make_enediyne(),//
-        make_enediyne(1),//
-        make_enediyne(2),
-        make_enediyne(3),
-        make_enol(),
-        make_enol(1),
-        make_enol_ether(),//
-        make_enol_ether(1),//
-        make_enol_ether(2),
-        make_enol_ether(3),
-        make_enone(),//
-        make_enone(1),//
-        make_enone(2),
-        make_enone(3),
-        make_episulfide(),//
-        make_episulfide(1),//
-        make_episulfide(2),
-        make_episulfide(3),
-        make_epoxide(),//
-        make_epoxide(1),//
-        make_epoxide(2),
-        make_epoxide(3),
-        make_ester(),
-        make_ester(1),
-        make_ether(),
-        make_ether(1),
-        make_fluorosulfonate(),
-        make_haloalkane("F"),
-        make_haloalkane("Cl"),
-        make_haloalkane("Br"),
-        make_haloalkane("I"),
-        make_halohydrin("F"),
-        make_halohydrin("Cl"),
-        make_halohydrin("Br"),
-        make_halohydrin("I"),
-        make_halohydrin("F", 1),
-        make_halohydrin("Cl", 1),
-        make_halohydrin("Br", 1),
-        make_halohydrin("I", 1),
-        make_haloketone("F"),//
-        make_haloketone("Cl"),//
-        make_haloketone("Br"),//
-        make_haloketone("I"),//
-        make_haloketone("F", 1),
-        make_haloketone("Cl", 1),
-        make_haloketone("Br", 1),
-        make_haloketone("I", 1),
-        make_haloketone("F", 2),
-        make_haloketone("Cl", 2),
-        make_haloketone("Br", 2),
-        make_haloketone("I", 2),
-        make_hemithioacetal(),
-        make_hemithioacetal(1),
-        make_carbohydrazides(),//
-        make_carbohydrazides(1),//
-        make_carbohydrazides(2),
-        make_carbohydrazides(3),
-        make_sulfonohydrazides(),//
-        make_sulfonohydrazides(1),//
-        make_sulfonohydrazides(2),
-        make_sulfonohydrazides(3),
-        // make_phosphonic_dihydrazides(),//
-        // make_phosphonic_dihydrazides(1),//
-        // make_phosphonic_dihydrazides(2),//
-        // make_phosphonic_dihydrazides(3),//
-        // make_phosphonic_dihydrazides(4),//
-        make_phosphonic_dihydrazides(5),
-        make_phosphonic_dihydrazides(6),
-        make_hydrazone(),
-        make_hydrazone(1),
-        make_hydroperoxide(),
-        make_hydroxamic_acid(),
-        make_hydroxamic_acid(1),
-        make_hydroxylamine(),
-        make_hydroxylamine(1),
-        make_imide(),//
-        make_imide(1),
-        make_imide(2),
-        make_imidic_acid(),
-        make_imidic_acid(1),
-        make_imidoyl_chloride(),
-        make_imidoyl_chloride(1),
-        make_imine(),//
-        make_imine(1),
-        make_imine(2),
-        make_iminium(),//
-        make_iminium(1),//
-        make_iminium(2),
-        make_iminium(3),
-        make_isocyanate(),
-        make_isocyanide(),
-        make_isodiazene(),
-        make_isodiazene(1),
-        make_isodiazomethane(),
-        make_isodiazomethane(1),
-        make_isothiocyanate(),
-        make_isothiouronium(),
-        make_ketene(),
-        make_ketene(1),
-        make_ketenimine(),//
-        make_ketenimine(1),
-        make_ketenimine(2),
-        make_ketone(),
-        make_ketone(1),
-        make_ketyl(),//
-        make_ketyl(1),
-        make_ketyl(2),
-        /* Lactone */
-        make_alpha_lactone("O"),
-        make_alpha_lactone("O", 1),
-        make_beta_lactone("O"),//
-        make_beta_lactone("O", 1),//
-        make_beta_lactone("O", 2),
-        make_beta_lactone("O", 3),
-        make_gamma_lactone("O"),//
-        make_gamma_lactone("O", 1),//
-        make_gamma_lactone("O", 2),//
-        make_gamma_lactone("O", 3),//
-        make_gamma_lactone("O", 4),
-        make_gamma_lactone("O", 5),
-        make_delta_lactone("O"),//
-        make_delta_lactone("O", 1),//
-        make_delta_lactone("O", 2),//
-        make_delta_lactone("O", 3),//
-        make_delta_lactone("O", 4),//
-        make_delta_lactone("O", 5),//
-        make_delta_lactone("O", 6),
-        make_delta_lactone("O", 7),
-        make_epislon_lactone("O"),//
-        make_epislon_lactone("O", 1),//
-        make_epislon_lactone("O", 2),//
-        make_epislon_lactone("O", 3),//
-        make_epislon_lactone("O", 4),//
-        make_epislon_lactone("O", 5),//
-        make_epislon_lactone("O", 6),//
-        make_epislon_lactone("O", 7),//
-        make_epislon_lactone("O", 8),
-        make_epislon_lactone("O", 9),
-        /* Lactam */
-        make_alpha_lactone("N"),
-        make_alpha_lactone("N", 1),
-        make_beta_lactone("N"),//
-        make_beta_lactone("N", 1),//
-        make_beta_lactone("N", 2),
-        make_beta_lactone("N", 3),
-        make_gamma_lactone("N"),//
-        make_gamma_lactone("N", 1),//
-        make_gamma_lactone("N", 2),//
-        make_gamma_lactone("N", 3),//
-        make_gamma_lactone("N", 4),
-        make_gamma_lactone("N", 5),
-        make_delta_lactone("N"),//
-        make_delta_lactone("N", 1),//
-        make_delta_lactone("N", 2),//
-        make_delta_lactone("N", 3),//
-        make_delta_lactone("N", 4),//
-        make_delta_lactone("N", 5),//
-        make_delta_lactone("N", 6),
-        make_delta_lactone("N", 7),
-        make_epislon_lactone("N"),//
-        make_epislon_lactone("N", 1),//
-        make_epislon_lactone("N", 2),//
-        make_epislon_lactone("N", 3),//
-        make_epislon_lactone("N", 4),//
-        make_epislon_lactone("N", 5),//
-        make_epislon_lactone("N", 6),//
-        make_epislon_lactone("N", 7),//
-        make_epislon_lactone("N", 8),
-        make_epislon_lactone("N", 9),
-        /* Thiolactone */
-        make_alpha_lactone("S"),
-        make_alpha_lactone("S", 1),
-        make_beta_lactone("S"),//
-        make_beta_lactone("S", 1),//
-        make_beta_lactone("S", 2),
-        make_beta_lactone("S", 3),
-        make_gamma_lactone("S"),//
-        make_gamma_lactone("S", 1),//
-        make_gamma_lactone("S", 2),//
-        make_gamma_lactone("S", 3),//
-        make_gamma_lactone("S", 4),
-        make_gamma_lactone("S", 5),
-        make_delta_lactone("S"),//
-        make_delta_lactone("S", 1),//
-        make_delta_lactone("S", 2),//
-        make_delta_lactone("S", 3),//
-        make_delta_lactone("S", 4),//
-        make_delta_lactone("S", 5),//
-        make_delta_lactone("S", 6),
-        make_delta_lactone("S", 7),
-        make_epislon_lactone("S"),//
-        make_epislon_lactone("S", 1),//
-        make_epislon_lactone("S", 2),//
-        make_epislon_lactone("S", 3),//
-        make_epislon_lactone("S", 4),//
-        make_epislon_lactone("S", 5),//
-        make_epislon_lactone("S", 6),//
-        make_epislon_lactone("S", 7),//
-        make_epislon_lactone("S", 8),
-        make_epislon_lactone("S", 9),
-        make_methanedithiol(),//
-        make_methanedithiol(1),//
-        make_methanedithiol(2),
-        make_methanedithiol(3),
-        make_methine(),//
-        make_methine(1),
-        make_methine(2),
-        make_methylene_bridge(),
-        make_methylenedioxy(),
-        make_methylenedioxy(1),
-        make_methylidene(),
-        make_nitrate_ester(),
-        make_nitrene(),
-        make_nitrile_ylide(),//
-        make_nitrile_ylide(1),
-        make_nitrile_ylide(2),
-        make_nitrilimine(),
-        make_nitrilimine(1),
-        make_nitro(),
-        make_nitroalkene(),//
-        make_nitroalkene(1),
-        make_nitroalkene(2),
-        make_nitroamine(),
-        make_nitroamine(1),
-        make_nitrolic_acid(),
-        make_nitronate(),//
-        make_nitronate(1),//
-        make_nitronate(2),
-        make_nitronate(3),
-        make_nitrone(),//
-        make_nitrone(1),
-        make_nitrone(2),
-        make_nitrosamine(),
-        make_nitrosamine(1),
-        make_nitroso(),
-        make_s_nitrosothiol(),
-        make_organic_acid_anhydride(),
-        make_organic_acid_anhydride(1),
-        make_organic_peroxide(),
-        make_organic_peroxide(1),
-        make_orthoester(),//
-        make_orthoester(1),//
-        make_orthoester(2),
-        make_orthoester(3),
-        make_oxaziridine(),//
-        make_oxaziridine(1),
-        make_oxaziridine(2),
-        make_phosphaalkene(),//
-        make_phosphaalkene(1),
-        make_phosphaalkene(2),
-        make_phosphaalkyne(),
-        make_phosphate(),//
-        make_phosphate(1),
-        make_phosphate(2),
-        make_phosphinate(),//
-        make_phosphinate(1),
-        make_phosphinate(2),
-        make_phosphine(),//
-        make_phosphine(1),
-        make_phosphine(2),
-        make_phosphine_imide(),//
-        make_phosphine_imide(1),//
-        make_phosphine_imide(2),
-        make_phosphine_imide(3),
-        make_phosphine_oxide(),//
-        make_phosphine_oxide(1),
-        make_phosphine_oxide(2),
-        make_phosphinite(),//
-        make_phosphinite(1),
-        make_phosphinite(2),
-        make_phosphinous_acids(),
-        make_phosphinous_acids(1),
-        make_phosphite_ester(),//
-        make_phosphite_ester(1),
-        make_phosphite_ester(2),
-        make_phosphonate(),//
-        make_phosphonate(1),
-        make_phosphonate(2),
-        make_phosphonite(),//
-        make_phosphonite(1),
-        make_phosphonite(2),
-        make_phosphonium(),//
-        make_phosphonium(1),//
-        make_phosphonium(2),
-        make_phosphonium(3),
-        make_phosphorodiamidate(),//
-        make_phosphorodiamidate(1),//
-        make_phosphorodiamidate(2),//
-        make_phosphorodiamidate(3),
-        make_phosphorodiamidate(4),
-        make_phosphoramidate(),//
-        make_phosphoramidate(1),//
-        make_phosphoramidate(2),
-        make_phosphoramidate(3),
-        make_phosphoramides(),//
-        make_phosphoramides(1),//
-        make_phosphoramides(2),//
-        make_phosphoramides(3),//
-        make_phosphoramides(4),
-        make_phosphoramides(5),
-        make_phosphoramidite(),//
-        make_phosphoramidite(1),//
-        make_phosphoramidite(2),
-        make_phosphoramidite(3),
-        make_phosphorane(),//
-        make_phosphorane(1),//
-        make_phosphorane(2),//
-        make_phosphorane(3),
-        make_phosphorane(4),
-        make_phosphorochloridate(),
-        make_phosphorochloridate(1),
-        make_phosphochloridite(),
-        make_phosphodichloridite(),
-        make_phosphodichloridite(1),
-        make_phosphoryl(),
-        make_propenyl(),
-        make_para_quinone_methide(),
-        make_ortho_quinone_methide(),
-        make_reductone(),
-        make_reductone(1),
-        make_schiff_base(),//
-        make_schiff_base(1),
-        make_schiff_base(2),
-        make_selenenic_acid(),
-        make_selenol(),
-        make_selenonic_acid(),
-        make_selone(),
-        make_selone(1),
-        make_semicarbazide(),//
-        make_semicarbazide(1),//
-        make_semicarbazide(2),//
-        make_semicarbazide(3),
-        make_semicarbazide(4),
-        make_semicarbazone(),//
-        make_semicarbazone(1),//
-        make_semicarbazone(2),//
-        make_semicarbazone(3),
-        make_semicarbazone(4),
-        make_silyl_enol_ether(),//
-        make_silyl_enol_ether(1),//
-        make_silyl_enol_ether(2),//
-        make_silyl_enol_ether(3),//
-        make_silyl_enol_ether(4),
-        make_silyl_enol_ether(5),
-        make_silyl_ether(),//
-        make_silyl_ether(1),//
-        make_silyl_ether(2),
-        make_silyl_ether(3),
-        make_sulfamoyl_fluoride(),
-        make_sulfamoyl_fluoride(1),
-        make_sulfenamide(),//
-        make_sulfenamide(1),
-        make_sulfenamide(2),
-        make_sulfenic_acid(),
-        make_sulfenyl_chloride(),
-        make_sulfide(),
-        make_sulfide(1),
-        make_sulfilimine(),//
-        make_sulfilimine(1),
-        make_sulfilimine(2),
-        make_sulfinamide(),//
-        make_sulfinamide(false),//
-        make_sulfinamide(true, 1),
-        make_sulfinamide(false, 1),
-        make_sulfinamide(true, 2),
-        make_sulfinamide(false, 2),
-        make_sulfinic_acid(),
-        make_sulfite_ester(),
-        make_sulfite_ester(1),
-        make_sulfonamide(),//
-        make_sulfonamide(1),
-        make_sulfonamide(2),
-        make_sulfonanilide(),
-        make_sulfonanilide(1),
-        make_sulfonate(),
-        make_sulfonate(1),
-        make_sulfone(),
-        make_sulfone(1),
-        make_sulfonic_acid(),
-        make_sulfonyl_halide("F"),
-        make_sulfonyl_halide("Cl"),
-        make_sulfonyl_halide("Br"),
-        make_sulfonyl_halide("I"),
-        make_sulfoxide(),
-        make_sulfoxide(1),
-        make_telluroketone(),
-        make_telluroketone(1),
-        make_tellurol(),
-        make_thiadiazoles(),
-        make_thiadiazoles(1),
-        make_thiadiazoles(0, 1),
-        make_thiadiazoles(1, 1),
-        make_thiadiazoles(0, 2),
-        make_thiadiazoles(1, 2),
-        make_thiadiazoles(0, 3),
-        make_thiadiazoles(0, 3),
-        make_thial(),
-        make_thioacetal(),//
-        make_thioacetal(1),
-        make_thioacetal(2),
-        make_dithioacetal(),//
-        make_dithioacetal(1),
-        make_dithioacetal(2),
-        make_thioacyl_chloride(),
-        make_thioamide(),//
-        make_thioamide(1),
-        make_thioamide(2),
-        make_thiocarbamate(),//
-        make_thiocarbamate(false),//
-        make_thiocarbamate(true, 1),
-        make_thiocarbamate(false, 1),
-        make_thiocarbamate(true, 2),
-        make_thiocarbamate(false, 2),
-        make_thiocarboxylic_acid(),
-        make_thiocarboxylic_acid(false),
-        make_thiocyanate(),
-        make_thioester(),
-        make_thioester(1),
-        make_thioketal(),//
-        make_thioketal(1),//
-        make_thioketal(2),
-        make_thioketal(3),
-        make_thioketene(),
-        make_thioketene(1),
-        make_thioketone(),
-        make_thioketone(1),
-        make_thiol(),
-        make_thiophosphate(),//
-        make_thiophosphate(1),
-        make_thiophosphate(2),
-        make_thiourea(),//
-        make_thiourea(false),//
-        make_thiourea(true, 1),//
-        make_thiourea(false, 1),//
-        make_thiourea(true, 2),
-        make_thiourea(false, 2),
-        make_thiourea(true, 3),
-        make_thiourea(false, 3),
-        make_tosyl(),
-        make_tosylate(),
-        make_tosylhydrazone(),
-        make_tosylhydrazone(1),
-        make_triazenes(),//
-        make_triazenes(1),
-        make_triazenes(2),
-        make_triuret(),//
-        make_triuret(1),//
-        make_triuret(2),//
-        make_triuret(3),//
-        make_triuret(4),
-        make_triuret(5),
-        make_urea(),//
-        make_urea(false),//
-        make_urea(true, 1),//
-        make_urea(false, 1),//
-        make_urea(true, 2),
-        make_urea(false, 2),
-        make_urea(true, 3),
-        make_urea(false, 3),
-        make_vanillyl(),
-        make_vinyl(),
-        make_vinylene(),
-        make_vinylene(1),
-        make_vinylidene(),//
-        make_vinylidene(1),//
-        make_vinylidene(2),
-        make_vinylidene(3),
-        make_xanthate("K"),
-        make_xanthate("Na"),
-        make_xanthate_ester(),
-        make_xanthate_ester(1),
-        make_ynolate(),//
-        make_ynolate(1),//
-        make_ynolate(2),
-        make_ynolate(3),
-        make_ynone(),
-        make_ynone(1)
+    char str[50];
+    sprintf(str, "make_sulfide_ether (h_num=%d)", h_num);
+
+    std::vector<int> permutation(h_num, -1);
+    permutation.insert(permutation.end(), 2 - h_num, 1);
+    
+    Atom atom_c("C");
+    Atom atom_s("S");
+    std::vector<std::function<void(RWMOL_SPTR, std::vector<uint8_t>&)>> func;
+    do
+    {
+        func.emplace_back(
+            [permutation = permutation, atom_c = atom_c, atom_s = atom_s] (RWMOL_SPTR mol, std::vector<uint8_t>& h_list) mutable
+            {
+                std::vector<uint8_t> link_point = calculate_link_point(mol, permutation, h_list);
+                mol->replaceAtom(link_point[0], &atom_c);
+                // c = link_point[0];
+                mol->replaceAtom(link_point[1], &atom_s);
+                // s = link_point[1];
+                add_bond(mol, link_point[0], link_point[1]);
+            }
+        );
+    } while (std::next_permutation(permutation.begin(), permutation.end()));
+    return std::make_tuple(std::string(str), 2 - h_num, func);
+}
+
+ModificationType make_methylmorpholine(int h_num = 0)
+{
+    char str[50];
+    sprintf(str, "methylmorpholine (h_num=%d)", h_num);
+
+    std::vector<int> permutation(h_num, -1);
+    permutation.insert(permutation.end(), 2 - h_num, 1);
+
+    Atom atom_c("C");
+    Atom atom_n("N");
+    Atom atom_o("O");
+    std::vector<std::function<void(RWMOL_SPTR, std::vector<uint8_t>&)>> func;
+    do
+    {
+        func.emplace_back(
+            [permutation = permutation, atom_c = atom_c, atom_n = atom_n, atom_o = atom_o] (RWMOL_SPTR mol, std::vector<uint8_t>& h_list) mutable
+            {
+                std::vector<uint8_t> link_point = calculate_link_point(mol, permutation, h_list);
+                mol->replaceAtom(link_point[0], &atom_n);
+
+                int up_c = mol->addAtom(&atom_c), up_c2 = mol->addAtom(&atom_c);
+                mol->addBond(link_point[0], up_c, Bond::BondType::SINGLE);
+                mol->addBond(up_c, up_c2, Bond::BondType::SINGLE);
+
+                int down_c = mol->addAtom(&atom_c), down_c2 = mol->addAtom(&atom_c);
+                mol->addBond(link_point[0], down_c, Bond::BondType::SINGLE);
+                mol->addBond(down_c, down_c2, Bond::BondType::SINGLE);
+
+                int o = mol->addAtom(&atom_o);
+                mol->addBond(up_c2, o, Bond::BondType::SINGLE);
+                mol->addBond(down_c2, o, Bond::BondType::SINGLE);
+            }
+        );
+    } while (std::next_permutation(permutation.begin(), permutation.end()));
+    return std::make_tuple(std::string(str), 2 - h_num, func);
+}
+
+ModificationType make_dioxolane(int h_num = 0)
+{
+    char str[50];
+    sprintf(str, "dioxolane (h_num=%d)", h_num);
+
+    std::vector<int> permutation(h_num, -1);
+    permutation.insert(permutation.end(), 3 - h_num, 1);
+
+    Atom atom_c("C");
+    Atom atom_o("O");
+    std::vector<std::function<void(RWMOL_SPTR, std::vector<uint8_t>&)>> func;
+    do
+    {
+        func.emplace_back(
+            [permutation = permutation, atom_c = atom_c, atom_o = atom_o] (RWMOL_SPTR mol, std::vector<uint8_t>& h_list) mutable
+            {
+                std::vector<uint8_t> link_point = calculate_link_point(mol, permutation, h_list);
+                mol->replaceAtom(link_point[0], &atom_o);
+                mol->replaceAtom(link_point[1], &atom_o);
+
+                int up_c = mol->addAtom(&atom_c), down_c = mol->addAtom(&atom_c);
+                mol->addBond(link_point[0], up_c, Bond::BondType::SINGLE);
+                mol->addBond(link_point[1], down_c, Bond::BondType::SINGLE);
+                mol->addBond(up_c, down_c, Bond::BondType::SINGLE);
+            }
+        );
+    } while (std::next_permutation(permutation.begin(), permutation.end()));
+    return std::make_tuple(std::string(str), 2 - h_num, func);
+}
+
+ModificationType make_test4(int pos = 0,int h_num = 0)
+{
+    char str[50];
+    sprintf(str, "test4 (h_num=%d)", h_num);
+
+    std::vector<int> permutation(h_num, -1);
+    permutation.insert(permutation.end(), 3 - h_num, 1);
+
+    Atom atom_c("C");
+    Atom atom_o("O");
+    std::vector<std::function<void(RWMOL_SPTR, std::vector<uint8_t>&)>> func;
+    do
+    {
+        func.emplace_back(
+            [permutation = permutation, pos = pos, atom_c = atom_c, atom_o = atom_o] (RWMOL_SPTR mol, std::vector<uint8_t>& h_list) mutable
+            {
+                std::vector<uint8_t> link_point = calculate_link_point(mol, permutation, h_list);
+
+                if (pos == 0) {
+                    mol->replaceAtom(link_point[0], &atom_o);
+                    mol->replaceAtom(link_point[1], &atom_c);
+                }
+                else {
+                    mol->replaceAtom(link_point[1], &atom_o);
+                    mol->replaceAtom(link_point[0], &atom_c);
+                }
+
+                int c = mol->addAtom(&atom_c);
+                mol->addBond(link_point[0], c, Bond::BondType::SINGLE);
+                mol->addBond(link_point[1], c, Bond::BondType::SINGLE);
+            }
+        );
+    } while (std::next_permutation(permutation.begin(), permutation.end()));
+    return std::make_tuple(std::string(str), 2 - h_num, func);
+}
+
+
+ModificationType make_Imide(int h_num = 0)
+{
+    char str[50];
+    sprintf(str, "Imide (h_num=%d)", h_num);
+
+    std::vector<int> permutation(h_num, -1);
+    permutation.insert(permutation.end(), 2 - h_num, 1);
+
+    Atom atom_c("C");
+    Atom atom_n("N");
+    Atom atom_o("O");
+    std::vector<std::function<void(RWMOL_SPTR, std::vector<uint8_t>&)>> func;
+    do
+    {
+        func.emplace_back(
+            [permutation = permutation, atom_c = atom_c, atom_n = atom_n, atom_o = atom_o] (RWMOL_SPTR mol, std::vector<uint8_t>& h_list) mutable
+            {
+                std::vector<uint8_t> link_point = calculate_link_point(mol, permutation, h_list);
+                mol->replaceAtom(link_point[0], &atom_n);
+
+                int up_c = mol->addAtom(&atom_c), up_c2 = mol->addAtom(&atom_c);
+                int up_o = mol->addAtom(&atom_o);
+                mol->addBond(link_point[0], up_c, Bond::BondType::SINGLE);
+                mol->addBond(up_c, up_o, Bond::BondType::DOUBLE);
+                mol->addBond(up_c, up_c2, Bond::BondType::SINGLE);
+
+                int down_c = mol->addAtom(&atom_c), down_c2 = mol->addAtom(&atom_c);
+                int down_o = mol->addAtom(&atom_o);
+                mol->addBond(link_point[0], down_c, Bond::BondType::SINGLE);
+                mol->addBond(down_c, down_o, Bond::BondType::DOUBLE);
+                mol->addBond(down_c, down_c2, Bond::BondType::SINGLE);
+
+                int last_c = up_c2;
+                int next_c;
+                // C6H5
+                for (int i = 0; i < 4; ++i)
+                {
+                    next_c = mol->addAtom(&atom_c);
+                    mol->addBond(last_c, next_c, Bond::BondType::AROMATIC);
+                    last_c = next_c;
+                }
+                mol->addBond(last_c, down_c2, Bond::BondType::AROMATIC);
+                mol->addBond(down_c2, up_c2, Bond::BondType::AROMATIC);
+            }
+        );
+    } while (std::next_permutation(permutation.begin(), permutation.end()));
+    return std::make_tuple(std::string(str), 2 - h_num, func);
+}
+
+ModificationType make_naphthalene(int h_num = 0)
+{
+    char str[50];
+    sprintf(str, "Naphthalene (h_num=%d)", h_num);
+
+    std::vector<int> permutation(h_num, -1);
+    permutation.insert(permutation.end(), 3 - h_num, 1);
+
+    Atom atom_c("C");
+    std::vector<std::function<void(RWMOL_SPTR, std::vector<uint8_t>&)>> func;
+    do
+    {
+        func.emplace_back(
+            [permutation = permutation, atom_c = atom_c] (RWMOL_SPTR mol, std::vector<uint8_t>& h_list) mutable
+            {
+                std::vector<uint8_t> link_point = calculate_link_point(mol, permutation, h_list);
+                mol->replaceAtom(link_point[0], &atom_c);
+                mol->replaceAtom(link_point[1], &atom_c);
+
+                int last_c = link_point[0];
+                int next_c;
+                // C6H5
+                for (int i = 0; i < 2; ++i)
+                {
+                    next_c = mol->addAtom(&atom_c);
+                    mol->addBond(last_c, next_c, Bond::BondType::AROMATIC);
+                    last_c = next_c;
+                }
+                mol->addBond(last_c, link_point[1], Bond::BondType::AROMATIC);
+                // mol->addBond(link_point[1], link_point[0], Bond::BondType::AROMATIC);
+
+            }
+        );
+    } while (std::next_permutation(permutation.begin(), permutation.end()));
+    return std::make_tuple(std::string(str), 2 - h_num, func);
+}
+
+ModificationType make_ben1(int h_num = 0)
+{
+    char str[50];
+    sprintf(str, "ben1 (h_num=%d)", h_num);
+    
+    Atom atom_c("C");
+    std::vector<std::function<void(RWMOL_SPTR, std::vector<uint8_t>&)>> func = {
+        [atom_c = atom_c] (RWMOL_SPTR mol, std::vector<uint8_t>& h_list) mutable
+        {
+            auto neighbors = mol->getAtomNeighbors(mol->getAtomWithIdx(h_list[0]));
+            auto first_atom = (*mol)[*boost::begin(neighbors)];
+            neighbors = mol->getAtomNeighbors(mol->getAtomWithIdx(first_atom->getIdx()));
+
+            if (first_atom->getSymbol() != "C")
+                return;
+
+            int num_h = 0;
+            std::vector<int> h_idx;
+            for (const auto &nbri : boost::make_iterator_range(neighbors))
+                if ((*mol)[nbri]->getSymbol() == "H")
+                {
+                    h_idx.push_back((*mol)[nbri]->getIdx());
+                    // std::cout << (*mol)[nbri]->getIdx() << " ";
+                    num_h++;
+                }
+                
+            // std::cout << "\n";
+
+            if (num_h == 3)
+            {
+                int first_c = first_atom->getIdx();
+                mol->replaceAtom(h_idx[0], &atom_c);
+                mol->replaceAtom(h_idx[1], &atom_c);
+                mol->removeAtom(h_idx[2]);
+
+                auto* bond = mol->getBondBetweenAtoms(first_c, h_idx[0]);
+                Bond* new_bond = new Bond(Bond::BondType::DOUBLE);
+                mol->replaceBond(bond->getIdx(), new_bond);
+
+                int prev_c = h_idx[0];
+                int next_c;
+                // C6H5
+                for (int i = 0; i < 3; ++i)
+                {
+                    next_c = mol->addAtom(&atom_c);
+                    if (i%2 == 1)
+                        mol->addBond(prev_c, next_c, Bond::BondType::DOUBLE);
+                    else
+                        mol->addBond(prev_c, next_c, Bond::BondType::SINGLE);
+                    prev_c = next_c;
+                }
+
+                mol->addBond(prev_c, h_idx[1], Bond::BondType::DOUBLE);
+
+                bond = mol->getBondBetweenAtoms(h_idx[1], first_c);
+                delete new_bond;
+                new_bond = new Bond(Bond::BondType::SINGLE);
+                mol->replaceBond(bond->getIdx(), new_bond);
+                delete new_bond;
+            }
+            // remove_atoms(mol, h_list.begin(), h_list.end());
+        }
     };
+    return std::make_tuple(std::string(str), 2, func);
+}
+
+ModificationType make_dialkyl(int num, int h_num = 0)
+{
+    char str[50];
+    sprintf(str, "dialkyl (num=%d, h_num=%d)", num, h_num);
+
+    Atom atom_c("C");
+    std::vector<std::function<void(RWMOL_SPTR, std::vector<uint8_t>&)>> func = {
+        [num = num, h_num = h_num, atom_c = atom_c] (RWMOL_SPTR mol, std::vector<uint8_t>& h_list) mutable
+        {
+            mol->replaceAtom(h_list[0], &atom_c);
+            int new_c;
+            int last_c = h_list[0];
+            for (int i = 0; i < num - 2; ++i)
+            {
+                new_c = mol->addAtom(&atom_c);
+                add_bond(mol, last_c, new_c);
+                last_c = new_c;
+            }
+            if (h_num == 1 && num!=0)
+            {
+                new_c = mol->addAtom(&atom_c);
+                add_bond(mol, last_c, new_c);
+            }
+            else if (h_num==0 && num!=0)
+            {
+                mol->replaceAtom(h_list[1], &atom_c);
+                add_bond(mol, last_c, h_list[1]);
+            }
+        }
+    };
+    return std::make_tuple(std::string(str), 2 - h_num, func);
 }

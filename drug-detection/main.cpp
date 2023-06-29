@@ -22,7 +22,7 @@ using namespace RDKit;
 #include <gperftools/profiler.h>
 
 std::vector<std::string> exceptions;
-constexpr int MOD_DEPTH = 2;
+constexpr int MOD_DEPTH = 1;
 constexpr int WRITE_FREQ = 100000;
 std::atomic<bool> quit(false);
 

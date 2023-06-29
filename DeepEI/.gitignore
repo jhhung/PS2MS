@@ -1,0 +1,13 @@
+/NIST2017/
+/Archive/
+/Temp/
+/Element/
+/.spyproject/
+*.pyc
+*.h5
+*.npy
+*.npz
+*.csv
+saved/
+DeepEI/data/paper/
+img/

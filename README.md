@@ -22,15 +22,31 @@ python predict.py --help
 - Original paper: ["Rapid Prediction of Electron–Ionization Mass Spectrometry Using Neural Networks"](https://pubs.acs.org/doi/10.1021/acscentsci.9b00085)
 - Source code: [NEIMS Github](https://github.com/brain-research/deep-molecular-massspec/issues)
 ### Usage:
-- Install conda env
+- TODO
 
 ## Drug-detection
 - By Samuel
 
 ### Usage:
+- Install conda env 
+```bash
+conda env create --name drug_detection -f drug-detection/environment.yml
+```
+- Build project
+```
+cd drug-detection
+conda activate drug_detection
+
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j
+```
+- Run permutation
 ```bash
 cd drug-detection
+conda activate drug_detection
+
 ./build/build_database <split_count> <split_idx> <output_dir>
 
-# for example: ./build/build_database 1 0 /tmp
+# for example: ./build/build_database 200 0 /tmp
 ```

@@ -14,13 +14,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
 class MLP:
-    def __init__(self, X, Y, X_test, Y_test):
+    def __init__(self, X, Y):
         self.X = X
         self.Y = Y
-
-        # use our fixed train / test split
-        self.X_tr, self.X_ts, self.Y_tr, self.Y_ts = X, X_test, Y, Y_test
-    
+        self.X_tr, self.X_ts, self.Y_tr, self.Y_ts = train_test_split(X, Y, test_size=0.1)
+        
         inp = Input(shape=(X.shape[1],))
         hid = inp
         n = X.shape[1]
@@ -34,7 +32,7 @@ class MLP:
         self.model = model
         
     def train(self, epochs=8):
-        return self.model.fit(self.X_tr, self.Y_tr, epochs=epochs)
+        self.model.fit(self.X_tr, self.Y_tr, epochs=epochs)
     
     def test(self):
         Y_pred = np.round(self.model.predict(self.X_ts))
@@ -44,9 +42,9 @@ class MLP:
         accuracy = accuracy_score(self.Y_ts[:,0], Y_pred[:,0])
         return accuracy, precision, recall, f1
     
-    def save(self, path, model_js_dir):
+    def save(self, path):
         model_json = self.model.to_json()
-        with open(model_js_dir, "w") as js:  
+        with open('Fingerprint/mlp_models/model.json', "w") as js:  
             js.write(model_json)
         self.model.save_weights(path)
         K.clear_session()

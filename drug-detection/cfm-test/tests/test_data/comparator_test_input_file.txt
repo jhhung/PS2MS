@@ -1,0 +1,4 @@
+3
+Test1 NCC 0
+Test2 NCCC 1
+Test3 NCCCC 2

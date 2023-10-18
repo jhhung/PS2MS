@@ -3,7 +3,7 @@
 Repository for NYCU JHHLab NPS detection project.
 The repository of the paper ["PS<sup>2</sup>MS"]().
 
-## NEIMS(Predict mass spectrums)
+## Predict mass spectrums(NEIMS)
 - Original paper: ["Rapid Prediction of Electron–Ionization Mass Spectrometry Using Neural Networks"](https://pubs.acs.org/doi/10.1021/acscentsci.9b00085)
 - Source code: [NEIMS Github](https://github.com/brain-research/deep-molecular-massspec/issues)
 - Quickstart of retraining model from NEIMS: [Model retrain quickstart](https://github.com/brain-research/deep-molecular-massspec/blob/main/Model_Retrain_Quickstart.md)
@@ -47,7 +47,7 @@ python3 sdf_to_msp.py ${input_file} ${is_predict_spectrum}
 * Convert files from SDF format to msp format.
 * `${is_predict_spectrum}`: a boolean value. If the input file contains predict mass spectrum, this value should beset to True.
 
-## DeepEI(Predict the fingerprints)
+## Predict the fingerprints(DeepEI)
 - Original paper: ["Predicting a Molecular Fingerprint from an Electron Ionization Mass Spectrum with Deep Neural Networks"](https://pubs.acs.org/doi/10.1021/acs.analchem.0c01450)
 - Source code: [DeepEI Github](https://github.com/hcji/DeepEI)
 
@@ -62,7 +62,7 @@ python3 merge_fp_into_msp.py \
   ${result.msp}
 ```
 
-## Enumeration(Enumerate the derivatives of Cathinone)
+## Enumerate the derivatives of Cathinone(Enumeration)
 - By Samuel
 
 ### Usage:
@@ -92,7 +92,7 @@ conda activate enumerate
 # for example: ./build/build_database 200 0 /tmp
 ```
 
-## Drug detection(Compare drugs with enumerate database)
+## Compare drugs with enumerate database(Drug detection)
 - Source code: [cfm-id-code](https://bitbucket.org/wishartlab/cfm-id-code/src/master/cfm/)
   - We utilize the data type and the function responsible for calculating the cosine similarity between two mass spectra in this project.
 

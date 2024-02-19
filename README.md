@@ -30,7 +30,7 @@ Finally, PS<sup>2</sup>MS calculates the integrated similarity scores(SMSF) betw
 ## NEIMS
 - PS<sup>2</sup>MS employs NEIMS to predict the mass spectrum of the compounds in synthetic database
 - The system uses NEIMS to predict the spectrum of compounds of synthetic database.
-- See how to train the NEIMS [here](enumeration/README.md)
+- See how to train the NEIMS [here](neims/README.md)
 
 
 ## DeepEI

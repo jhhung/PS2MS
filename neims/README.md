@@ -4,6 +4,13 @@
 - Source code: [NEIMS Github](https://github.com/brain-research/deep-molecular-massspec/issues)
 - Quickstart of retraining model from NEIMS: [Model retrain quickstart](https://github.com/brain-research/deep-molecular-massspec/blob/main/Model_Retrain_Quickstart.md)
 
+## Requirement
+
+- [python 3.6.9](https://www.python.org/downloads/) or higher to the run deep learing tools
+- [rdkit](https://www.rdkit.org/docs/Install.html)
+  - build the c++ code from the source and install python package from conda
+
+
 ## Usage:
 
 ### Prepare dataset

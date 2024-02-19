@@ -37,8 +37,11 @@ Finally, PS<sup>2</sup>MS calculates the integrated similarity scores(SMSF) betw
 - PS<sup>2</sup>MS employs DeepEI to predict the fingerprint of the unknown analyte.
 - The system also use the function of DeepEI to calculate the fingerprint of compounds of synthetic database.
 - The system merges the fingerprint into the msp file.
+- See how to predict fingerprint [here](DeepEI/README.md)
 
 
 ## Drug detection
 - The final step of PS<sup>2</sup>MS is to compare the analyte and the synthetic database.
 - The system will compare the spectrum and chemical fingerprint between compounds and generate a list of the hundred most similar compounds which are ranked by similarity score.
+- See how to build and run drug detection [here](drug-detection/README.md)
+

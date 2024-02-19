@@ -4,6 +4,13 @@
 - Source code: [DeepEI Github](https://github.com/hcji/DeepEI)
 - Original markdown: [DeepEI ReadMe.md](https://github.com/hcji/DeepEI/blob/master/ReadMe.md)
 
+## Requirement
+
+- [python 3.6.9](https://www.python.org/downloads/) or higher to the run deep learing tools
+- [rdkit](https://www.rdkit.org/docs/Install.html)
+  - build the c++ code from the source and install python package from conda
+
+
 ## Usage:
 
 ### Install conda env 

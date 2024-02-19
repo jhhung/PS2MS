@@ -2,6 +2,14 @@
 - The final step of PS<sup>2</sup>MS is to compare the analyte and the synthetic database
 - We utilize the data type from the [cfm-id-code](https://bitbucket.org/wishartlab/cfm-id-code/src/master/cfm/) project
 
+## Requirement
+
+- GNU [g++-10](https://gcc.gnu.org/gcc-10/) or higher
+- [CMake 3.16.0](https://cmake.org/download/) or higher to build the enumeration step and the detection step
+- [rdkit](https://www.rdkit.org/docs/Install.html)
+  - build the c++ code from the source and install python package from conda
+
+
 ## Usage
 
 ### Build project

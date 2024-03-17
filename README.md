@@ -2,7 +2,7 @@
 
 Repository for NYCU JHHLab NPS detection project. 
 
-The repository for the paper ["PS<sup>2</sup>MS"](): A Deep Learning-Based Prediction System for Detecting Novel New Psychoactive Substances Using Mass Spectrometry.
+The repository for the paper ["PS<sup>2</sup>MS"](https://pubs.acs.org/doi/full/10.1021/acs.analchem.3c05019?ref=utm_source%3Dpubsw&utm_campaign=IC004_ST0004D_T000549_OA_Microsite_LP&src=IC004_ST0004D_T000549_OA_Microsite_LP&utm_medium=web): A Deep Learning-Based Prediction System for Detecting Novel New Psychoactive Substances Using Mass Spectrometry.
 
 ## Informations
 
